@@ -60,7 +60,15 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const missingTable = error.message.includes("Could not find the table");
+    return NextResponse.json(
+      {
+        error: missingTable
+          ? "Database not set up yet. Run supabase/schema.sql in the Supabase SQL Editor, or: npm run db:setup"
+          : error.message,
+      },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ booking: data });
