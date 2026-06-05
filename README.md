@@ -5,5 +5,5 @@ Australian tour marketplace — book tours direct from local operators at a fair
 ## Usage
 
 ```bash
-docker compose up --build
+docker compose --env-file .env.local up --build
 ```
