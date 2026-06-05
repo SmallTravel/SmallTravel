@@ -1,3 +1,7 @@
+# Docker Compose only auto-loads ".env" for ${VAR} substitution — not ".env.local".
+# Run: docker compose --env-file .env.local up --build
+# Or:  npm run docker:up
+
 services:
   app:
     build:
@@ -8,10 +12,6 @@ services:
         NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
     ports:
       - "3000:3000"
-    environment:
-      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
-      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY}
     env_file:
       - .env.local
     restart: unless-stopped
