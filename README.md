@@ -1,6 +1,6 @@
 ## Summary
 
-Australian tour marketplace — book tours direct from local operators at a fair 15% commission.
+Digital travel agent
 
 ## Usage
 
