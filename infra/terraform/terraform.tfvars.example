@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars and adjust. Do not commit secrets.
+
+aws_region      = "ap-southeast-2"
+project_name    = "smalltravel"
+github_repository = "SmallTravel/SmallTravel"
+github_branch   = "main"
+
+# Add runtime secrets here or via TF_VAR_* / -var flags:
+# apprunner_runtime_environment_variables = {
+#   NODE_ENV              = "production"
+#   SUPABASE_SECRET_KEY   = "sb_secret_..."
+# }

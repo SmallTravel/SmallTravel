@@ -1,0 +1,13 @@
+# Optional remote state — create these once in AWS, then:
+#   cp backend.tf.example backend.tf
+#   terraform init -migrate-state
+
+terraform {
+  backend "s3" {
+    bucket         = "smalltravel-terraform-state"
+    key            = "prod/terraform.tfstate"
+    region         = "ap-southeast-2"
+    dynamodb_table = "smalltravel-terraform-lock"
+    encrypt        = true
+  }
+}

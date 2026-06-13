@@ -10,9 +10,9 @@ docker compose --env-file .env.local up --build
 
 ## Deploy to AWS
 
-App Runner + ECR + GitHub OIDC (no long-lived AWS keys). See **[docs/aws-deploy.md](docs/aws-deploy.md)**.
+App Runner + ECR + GitHub OIDC (no long-lived AWS keys). Infrastructure is managed with **Terraform** in [`infra/terraform`](infra/terraform/README.md); deploy guide in [`docs/aws-deploy.md`](docs/aws-deploy.md).
 
-**Production:** https://k26pdkus59.ap-southeast-2.awsapprunner.com — deploys automatically on push to `main`.
+**Production:** https://k26pdkus59.ap-southeast-2.awsapprunner.com — app code deploys on push to `main`; infra changes via `terraform apply`.
 
 ## Sanity CMS (marketing content)
 
