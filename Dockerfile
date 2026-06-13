@@ -6,7 +6,7 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
@@ -42,6 +42,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
 
-CMD ["node", "server.js"]
+# App Runner injects HOSTNAME (pod name); Next.js standalone binds to it and
+# fails health checks. Force 0.0.0.0 at process start instead of ENV HOSTNAME.
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 exec node server.js"]

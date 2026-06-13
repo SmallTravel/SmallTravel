@@ -8,6 +8,12 @@ Digital travel marketplace — book tours from local Australian operators.
 docker compose --env-file .env.local up --build
 ```
 
+## Deploy to AWS
+
+App Runner + ECR + GitHub OIDC (no long-lived AWS keys). See **[docs/aws-deploy.md](docs/aws-deploy.md)**.
+
+**Production:** https://k26pdkus59.ap-southeast-2.awsapprunner.com — deploys automatically on push to `main`.
+
 ## Sanity CMS (marketing content)
 
 Homepage copy is editable in Sanity at `/studio`. Tours and bookings stay in Supabase.
