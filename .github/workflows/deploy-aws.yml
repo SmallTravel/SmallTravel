@@ -57,11 +57,24 @@ jobs:
           docker push "$REGISTRY/$ECR_REPOSITORY:latest"
           docker push "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Trigger App Runner deployment
+      - name: Wait for App Runner deployment
         env:
           APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
         if: env.APP_RUNNER_SERVICE_ARN != ''
         run: |
-          aws apprunner start-deployment \
-            --service-arn "$APP_RUNNER_SERVICE_ARN" \
-            --region "${{ env.AWS_REGION }}"
+          # ECR auto-deploy is enabled; pushing :latest already starts a deployment.
+          # Poll until the service is RUNNING (or fail if CREATE/UPDATE failed).
+          for i in $(seq 1 30); do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "$APP_RUNNER_SERVICE_ARN" \
+              --region "${{ env.AWS_REGION }}" \
+              --query 'Service.Status' --output text)
+            echo "App Runner status: $STATUS (attempt $i/30)"
+            case "$STATUS" in
+              RUNNING) exit 0 ;;
+              CREATE_FAILED|UPDATE_FAILED|DELETE_FAILED) exit 1 ;;
+            esac
+            sleep 20
+          done
+          echo "Timed out waiting for App Runner to reach RUNNING"
+          exit 1
