@@ -5,6 +5,10 @@ export function isSupabaseConfigured() {
   );
 }
 
+export function isSanityConfigured() {
+  return Boolean(process.env.NEXT_PUBLIC_SANITY_PROJECT_ID);
+}
+
 export function formatPrice(amount: number) {
   return new Intl.NumberFormat("en-AU", {
     style: "currency",
