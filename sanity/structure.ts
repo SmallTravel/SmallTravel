@@ -9,4 +9,9 @@ export const structure: StructureResolver = (S) =>
         .child(
           S.document().schemaType("homepage").documentId("homepage")
         ),
+      S.listItem()
+        .title("Tours page")
+        .child(
+          S.document().schemaType("toursPage").documentId("toursPage")
+        ),
     ]);

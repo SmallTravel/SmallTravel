@@ -30,3 +30,13 @@ export const homepageQuery = groq`
     ctaSecondaryLabel
   }
 `;
+
+export const toursPageQuery = groq`
+  *[_type == "toursPage" && _id == "toursPage"][0]{
+    metaTitle,
+    metaDescription,
+    eyebrow,
+    title,
+    description
+  }
+`;

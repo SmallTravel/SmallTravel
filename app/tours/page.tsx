@@ -1,28 +1,32 @@
+import type { Metadata } from "next";
 import Nav from "@/components/marketing/Nav";
 import Footer from "@/components/marketing/Footer";
 import TourCard from "@/components/tours/TourCard";
+import { getToursPage } from "@/lib/sanity/get-tours-page";
 import { getTours } from "@/lib/tours";
 
-export const metadata = {
-  title: "Browse tours — Australia Trip Planner",
-  description: "Book authentic Australian tours direct from local operators. Fair 15% commission.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getToursPage();
+  return {
+    title: content.metaTitle,
+    description: content.metaDescription,
+  };
+}
 
 export default async function ToursPage() {
-  const tours = await getTours();
+  const [tours, content] = await Promise.all([getTours(), getToursPage()]);
 
   return (
     <main>
       <Nav />
       <section className="bg-white border-b border-ink-100">
         <div className="container-narrow section-pad !pb-12">
-          <span className="eyebrow">All tours</span>
+          <span className="eyebrow">{content.eyebrow}</span>
           <h1 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight text-ink-900">
-            Book direct from local operators
+            {content.title}
           </h1>
           <p className="mt-4 text-lg text-ink-600 max-w-2xl">
-            Every tour is run by an independent Australian operator. They get free promotion;
-            you get authentic experiences — and they only pay 15% on confirmed bookings.
+            {content.description}
           </p>
         </div>
       </section>

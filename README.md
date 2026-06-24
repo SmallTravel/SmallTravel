@@ -56,10 +56,24 @@ npm run dev
 To redeploy the hosted Studio after schema changes:
 
 ```bash
-npm run sanity:deploy
+npm run cms:deploy
 ```
 
-Use `npm run sanity:deploy` (not plain `sanity deploy`) — the hosted Studio runs at `/` while the embedded Studio in this app uses `/studio`.
+Full update (Studio + seed content + production app):
+
+```bash
+npm run cms:deploy -- --seed --app
+```
+
+Options:
+
+| Flag | What it does |
+|------|----------------|
+| *(none)* | Deploy hosted Studio only |
+| `--seed` | Import default content from `sanity/seed/` |
+| `--app` | Push to `main` (if needed) and trigger AWS deploy via GitHub Actions |
+
+`sanity:deploy` is an alias for `cms:deploy`. Use `npm run cms:deploy` (not plain `sanity deploy`) — the hosted Studio runs at `/` while the embedded Studio in this app uses `/studio`.
 
 ### 5. (Optional) Seed default homepage content
 

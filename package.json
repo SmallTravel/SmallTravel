@@ -8,8 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "db:setup": "node scripts/setup-db.mjs",
-    "sanity:seed": "sanity dataset import sanity/seed/homepage.ndjson --dataset production --replace",
-    "sanity:deploy": "set -a && [ -f .env.local ] && . ./.env.local; set +a && SANITY_STUDIO_BASE_PATH=/ SANITY_STUDIO_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID:-as3gpuo3} SANITY_STUDIO_DATASET=${NEXT_PUBLIC_SANITY_DATASET:-production} sanity deploy --url australia-trip-planner -y",
+    "sanity:seed": "sanity dataset import sanity/seed/homepage.ndjson --dataset production --replace && sanity dataset import sanity/seed/tours-page.ndjson --dataset production --replace",
+    "sanity:deploy": "bash scripts/deploy-cms.sh",
+    "cms:deploy": "bash scripts/deploy-cms.sh",
     "docker:up": "docker compose --env-file .env.local up --build",
     "docker:up:detached": "docker compose --env-file .env.local up --build -d"
   },
