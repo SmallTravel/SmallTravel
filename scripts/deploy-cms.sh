@@ -82,6 +82,9 @@ if $SEED; then
       "${SANITY_BIN[@]}" dataset import "$file" --dataset "$DATASET" --replace
     fi
   done
+  echo ""
+  echo "→ Uploading tour images to Sanity CDN..."
+  npm run sanity:migrate-images
 fi
 
 if $APP; then

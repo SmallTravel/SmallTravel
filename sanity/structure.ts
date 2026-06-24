@@ -14,4 +14,15 @@ export const structure: StructureResolver = (S) =>
         .child(
           S.document().schemaType("toursPage").documentId("toursPage")
         ),
+      S.divider(),
+      S.listItem()
+        .title("Tours")
+        .child(
+          S.documentTypeList("tour")
+            .title("Tours")
+            .defaultOrdering([
+              { field: "featured", direction: "desc" },
+              { field: "title", direction: "asc" },
+            ])
+        ),
     ]);

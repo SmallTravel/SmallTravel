@@ -40,3 +40,34 @@ export const toursPageQuery = groq`
     description
   }
 `;
+
+export const toursQuery = groq`
+  *[_type == "tour"] | order(featured desc, title asc) {
+    _id,
+    "slug": slug.current,
+    title,
+    operatorName,
+    operatorLocation,
+    description,
+    longDescription,
+    destination,
+    state,
+    duration,
+    priceAud,
+    commissionRate,
+    maxGuests,
+    image {
+      asset->{ _id, url },
+      hotspot,
+      crop,
+      alt
+    },
+    imageUrl,
+    highlights,
+    includes,
+    meetingPoint,
+    rating,
+    reviewCount,
+    featured
+  }
+`;

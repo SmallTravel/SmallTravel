@@ -16,7 +16,7 @@ App Runner + ECR + GitHub OIDC (no long-lived AWS keys). Infrastructure is manag
 
 ## Sanity CMS (marketing content)
 
-Homepage copy is editable in Sanity at `/studio`. Tours and bookings stay in Supabase.
+Homepage copy and **tour listings** are editable in Sanity. Bookings stay in Supabase.
 
 ### 1. Create a Sanity project
 
