@@ -1,6 +1,6 @@
 ## Summary
 
-Digital travel marketplace — book tours from local Australian operators.
+AI Travel marketplace — book tours from local Australian operators.
 
 ## Usage
 
