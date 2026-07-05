@@ -41,6 +41,70 @@ export const toursPageQuery = groq`
   }
 `;
 
+export const destinationsQuery = groq`
+  {
+    "states": *[_type == "stateGuide"] | order(name asc) {
+      name,
+      slug,
+      description,
+      imageUrl,
+      metaTitle,
+      metaDescription,
+      image {
+        asset->{ url },
+        alt
+      }
+    },
+    "cities": *[_type == "cityGuide"] | order(stateSlug asc, cityName asc) {
+      cityName,
+      stateSlug,
+      citySlug,
+      shortDescription,
+      cardImageUrl,
+      heroImageUrl,
+      intro,
+      heroImage {
+        asset->{ url }
+      }
+    }
+  }
+`;
+
+export const cityGuideQuery = groq`
+  *[_type == "cityGuide" && stateSlug == $stateSlug && citySlug == $citySlug][0]{
+    cityName,
+    shortDescription,
+    cardImageUrl,
+    pageTitle,
+    metaTitle,
+    metaDescription,
+    intro,
+    heroCaption,
+    heroImageUrl,
+    heroImage {
+      asset->{ url },
+      alt
+    },
+    content[]{
+      _type,
+      _key,
+      text,
+      level,
+      anchorId,
+      caption,
+      externalUrl,
+      image {
+        asset->{ url },
+        alt
+      },
+      items[]{
+        text,
+        subItems
+      }
+    }
+  }
+`;
+
 export const toursQuery = groq`
   *[_type == "tour"] | order(featured desc, title asc) {
     _id,

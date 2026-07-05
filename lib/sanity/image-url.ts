@@ -7,3 +7,9 @@ export function tourImageUrl(source: SanityImageSource | null | undefined): stri
   if (!source) return "";
   return builder.image(source).width(1200).quality(80).auto("format").url();
 }
+
+export function sanityImageUrl(
+  source: SanityImageSource | null | undefined
+): string {
+  return tourImageUrl(source);
+}

@@ -5,8 +5,8 @@ export default function Footer() {
   return (
     <footer className="bg-ink-900 text-ink-300">
       <div className="container-narrow px-6 sm:px-10 lg:px-16 py-16 lg:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+          <div className="sm:col-span-2 lg:col-span-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-brand-600 flex items-center justify-center text-white">
                 <MapPin className="w-4 h-4" />
@@ -25,6 +25,16 @@ export default function Footer() {
               <li><Link href="/tours" className="hover:text-white transition">Browse tours</Link></li>
               <li><Link href="/bookings" className="hover:text-white transition">My bookings</Link></li>
               <li><Link href="/signup" className="hover:text-white transition">Create account</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-4">Destinations</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/destinations/new-south-wales/sydney" className="hover:text-white transition">Sydney</Link></li>
+              <li><Link href="/destinations/new-south-wales" className="hover:text-white transition">New South Wales</Link></li>
+              <li><Link href="/destinations/queensland" className="hover:text-white transition">Queensland</Link></li>
+              <li><Link href="/destinations" className="hover:text-white transition">All destinations</Link></li>
             </ul>
           </div>
 

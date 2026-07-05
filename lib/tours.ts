@@ -38,3 +38,26 @@ export async function getTourById(id: string): Promise<Tour | null> {
   const tours = await getTours();
   return tours.find((t) => t.id === id) ?? null;
 }
+
+export async function getToursByState(stateName: string): Promise<Tour[]> {
+  const tours = await getTours();
+  return tours.filter((t) => t.state === stateName);
+}
+
+export async function getToursByCity(
+  stateName: string,
+  cityName: string
+): Promise<Tour[]> {
+  const tours = await getTours();
+  const needle = cityName.toLowerCase();
+
+  return tours.filter((t) => {
+    if (t.state !== stateName) return false;
+    return (
+      t.destination.toLowerCase().includes(needle) ||
+      t.operator_location.toLowerCase().includes(needle) ||
+      t.meeting_point.toLowerCase().includes(needle) ||
+      t.description.toLowerCase().includes(needle)
+    );
+  });
+}

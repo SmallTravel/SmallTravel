@@ -16,6 +16,31 @@ export const structure: StructureResolver = (S) =>
         ),
       S.divider(),
       S.listItem()
+        .title("Destinations")
+        .child(
+          S.list()
+            .title("Destinations")
+            .items([
+              S.listItem()
+                .title("States")
+                .child(
+                  S.documentTypeList("stateGuide")
+                    .title("States")
+                    .defaultOrdering([{ field: "name", direction: "asc" }])
+                ),
+              S.listItem()
+                .title("Cities")
+                .child(
+                  S.documentTypeList("cityGuide")
+                    .title("Cities")
+                    .defaultOrdering([
+                      { field: "stateSlug", direction: "asc" },
+                      { field: "cityName", direction: "asc" },
+                    ])
+                ),
+            ])
+        ),
+      S.listItem()
         .title("Tours")
         .child(
           S.documentTypeList("tour")
