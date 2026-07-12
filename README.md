@@ -1,6 +1,6 @@
 ## Summary
 
-AI Travel marketplace — book tours from local Australian operators.
+Travel marketplace — book tours from local Australian operators.
 
 ## Usage
 
