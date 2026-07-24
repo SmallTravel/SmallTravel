@@ -3,7 +3,6 @@ import {
   extractNavSections,
   getCityPath as cityPath,
 } from "@/lib/destinations-nav";
-import { getStaticCityGuide } from "@/lib/destination-guides";
 import { isSanityConfigured } from "@/lib/config";
 import { getDestinations } from "@/lib/sanity/get-destinations";
 import { getSanityClient } from "@/lib/sanity/client";
@@ -13,7 +12,7 @@ import {
 } from "@/lib/sanity/map-city-guide";
 
 const destinationNavQuery = `
-  *[_type == "cityGuide"] | order(stateSlug asc, cityName asc) {
+  *[_type == "cityGuide" && !(_id in path("drafts.**"))] | order(stateSlug asc, cityName asc) {
     cityName,
     stateSlug,
     citySlug,
@@ -47,15 +46,6 @@ function sectionsFromSanityContent(
   return extractNavSections(stateSlug, citySlug, blocks);
 }
 
-function sectionsFromStatic(
-  stateSlug: string,
-  citySlug: string
-): CityNavData["sections"] {
-  const guide = getStaticCityGuide(stateSlug, citySlug);
-  if (!guide) return [];
-  return extractNavSections(stateSlug, citySlug, guide.blocks);
-}
-
 function buildCityNavData(
   stateSlug: string,
   citySlug: string,
@@ -72,55 +62,52 @@ function buildCityNavData(
 }
 
 export async function getDestinationNavData(): Promise<CityNavData[]> {
+  if (!isSanityConfigured()) {
+    throw new Error("Sanity CMS is required for destination navigation");
+  }
+
   const states = await getDestinations();
   const navByKey = new Map<string, CityNavData>();
 
-  if (isSanityConfigured()) {
-    try {
-      const fetchOptions =
-        process.env.NODE_ENV === "development"
-          ? { cache: "no-store" as const }
-          : { next: { revalidate: 60 } };
+  const fetchOptions =
+    process.env.NODE_ENV === "development"
+      ? { cache: "no-store" as const }
+      : { next: { revalidate: 60 } };
 
-      const docs = await getSanityClient().fetch<SanityNavDoc[]>(
-        destinationNavQuery,
-        {},
-        fetchOptions
-      );
+  const docs = await getSanityClient().fetch<SanityNavDoc[]>(
+    destinationNavQuery,
+    {},
+    fetchOptions
+  );
 
-      for (const doc of docs) {
-        const key = `${doc.stateSlug}/${doc.citySlug}`;
-        const cityName =
-          doc.cityName ??
-          states
-            .find((s) => s.slug === doc.stateSlug)
-            ?.cities.find((c) => c.slug === doc.citySlug)?.name ??
-          doc.citySlug;
+  for (const doc of docs) {
+    const key = `${doc.stateSlug}/${doc.citySlug}`;
+    const cityName =
+      doc.cityName ??
+      states
+        .find((s) => s.slug === doc.stateSlug)
+        ?.cities.find((c) => c.slug === doc.citySlug)?.name ??
+      doc.citySlug;
 
-        navByKey.set(
-          key,
-          buildCityNavData(
-            doc.stateSlug,
-            doc.citySlug,
-            cityName,
-            sectionsFromSanityContent(doc.stateSlug, doc.citySlug, doc.content)
-          )
-        );
-      }
-    } catch {
-      // fall through
-    }
+    navByKey.set(
+      key,
+      buildCityNavData(
+        doc.stateSlug,
+        doc.citySlug,
+        cityName,
+        sectionsFromSanityContent(doc.stateSlug, doc.citySlug, doc.content)
+      )
+    );
   }
 
+  // Ensure every published city appears in nav even without section headings
   for (const state of states) {
     for (const city of state.cities) {
       const key = `${state.slug}/${city.slug}`;
       if (navByKey.has(key)) continue;
-
-      const sections = sectionsFromStatic(state.slug, city.slug);
       navByKey.set(
         key,
-        buildCityNavData(state.slug, city.slug, city.name, sections)
+        buildCityNavData(state.slug, city.slug, city.name, [])
       );
     }
   }

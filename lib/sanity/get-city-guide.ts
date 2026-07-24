@@ -1,10 +1,6 @@
 import { isSanityConfigured } from "@/lib/config";
 import type { CityGuide } from "@/lib/destinations";
 import { normalizeGuideBlocks } from "@/lib/destinations-nav";
-import {
-  buildDefaultCityGuide,
-  getStaticCityGuide,
-} from "@/lib/destination-guides";
 import { getSanityClient } from "@/lib/sanity/client";
 import {
   mapSanityCityGuide,
@@ -15,14 +11,10 @@ import { cityGuideQuery } from "@/lib/sanity/queries";
 export async function getCityGuideContent(
   stateSlug: string,
   citySlug: string,
-  cityMeta: { name: string; description: string; imageUrl: string }
+  _cityMeta?: { name: string; description: string; imageUrl: string }
 ): Promise<CityGuide> {
-  const fallback =
-    getStaticCityGuide(stateSlug, citySlug) ??
-    buildDefaultCityGuide(cityMeta.name, cityMeta.description, cityMeta.imageUrl);
-
   if (!isSanityConfigured()) {
-    return { ...fallback, blocks: normalizeGuideBlocks(fallback.blocks) };
+    throw new Error("Sanity CMS is required for city guides");
   }
 
   const fetchOptions =
@@ -30,18 +22,18 @@ export async function getCityGuideContent(
       ? { cache: "no-store" as const }
       : { next: { revalidate: 60 } };
 
-  try {
-    const doc = await getSanityClient().fetch<SanityCityGuideDoc | null>(
-      cityGuideQuery,
-      { stateSlug, citySlug },
-      fetchOptions
+  const doc = await getSanityClient().fetch<SanityCityGuideDoc | null>(
+    cityGuideQuery,
+    { stateSlug, citySlug },
+    fetchOptions
+  );
+
+  const guide = doc ? mapSanityCityGuide(doc) : null;
+  if (!guide) {
+    throw new Error(
+      `City guide not found in CMS: ${stateSlug}/${citySlug}`
     );
-
-    if (!doc?.pageTitle) return fallback;
-
-    const guide = mapSanityCityGuide(doc, fallback) ?? fallback;
-    return { ...guide, blocks: normalizeGuideBlocks(guide.blocks) };
-  } catch {
-    return { ...fallback, blocks: normalizeGuideBlocks(fallback.blocks) };
   }
+
+  return { ...guide, blocks: normalizeGuideBlocks(guide.blocks) };
 }

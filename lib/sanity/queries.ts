@@ -43,7 +43,7 @@ export const toursPageQuery = groq`
 
 export const destinationsQuery = groq`
   {
-    "states": *[_type == "stateGuide"] | order(name asc) {
+    "states": *[_type == "stateGuide" && !(_id in path("drafts.**"))] | order(name asc) {
       name,
       slug,
       description,
@@ -55,7 +55,7 @@ export const destinationsQuery = groq`
         alt
       }
     },
-    "cities": *[_type == "cityGuide"] | order(stateSlug asc, cityName asc) {
+    "cities": *[_type == "cityGuide" && !(_id in path("drafts.**"))] | order(stateSlug asc, cityName asc) {
       cityName,
       stateSlug,
       citySlug,

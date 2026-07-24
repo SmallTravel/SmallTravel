@@ -1,6 +1,5 @@
 import { isSanityConfigured } from "@/lib/config";
 import type { City, State } from "@/lib/destinations";
-import { FALLBACK_DESTINATIONS } from "@/lib/destinations-defaults";
 import { getSanityClient } from "@/lib/sanity/client";
 import {
   mapSanityCityToCity,
@@ -36,26 +35,26 @@ function buildStatesFromSanity(payload: DestinationsPayload): State[] {
 }
 
 export async function getDestinations(): Promise<State[]> {
-  if (!isSanityConfigured()) return FALLBACK_DESTINATIONS;
+  if (!isSanityConfigured()) {
+    throw new Error("Sanity CMS is required for destinations");
+  }
 
   const fetchOptions =
     process.env.NODE_ENV === "development"
       ? { cache: "no-store" as const }
       : { next: { revalidate: 60 } };
 
-  try {
-    const payload = await getSanityClient().fetch<DestinationsPayload>(
-      destinationsQuery,
-      {},
-      fetchOptions
-    );
+  const payload = await getSanityClient().fetch<DestinationsPayload>(
+    destinationsQuery,
+    {},
+    fetchOptions
+  );
 
-    if (!payload?.states?.length) return FALLBACK_DESTINATIONS;
-
-    return buildStatesFromSanity(payload);
-  } catch {
-    return FALLBACK_DESTINATIONS;
+  if (!payload?.states?.length) {
+    throw new Error("No state guides found in CMS");
   }
+
+  return buildStatesFromSanity(payload);
 }
 
 export async function getStateBySlug(slug: string): Promise<State | undefined> {

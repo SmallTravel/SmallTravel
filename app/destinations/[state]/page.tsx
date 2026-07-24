@@ -22,16 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const state = await getStateBySlug(stateSlug);
   if (!state) return { title: "Destination not found" };
 
-  const guide = await getStateGuideContent(stateSlug, {
-    name: state.name,
-    description: state.description,
-    imageUrl: state.imageUrl,
-  });
-
-  return {
-    title: guide.metaTitle,
-    description: guide.metaDescription,
-  };
+  try {
+    const guide = await getStateGuideContent(stateSlug);
+    return {
+      title: guide.metaTitle,
+      description: guide.metaDescription,
+    };
+  } catch {
+    return { title: "Destination not found" };
+  }
 }
 
 export default async function StateDestinationPage({ params }: Props) {
@@ -39,11 +38,12 @@ export default async function StateDestinationPage({ params }: Props) {
   const state = await getStateBySlug(stateSlug);
   if (!state) notFound();
 
-  const guide = await getStateGuideContent(stateSlug, {
-    name: state.name,
-    description: state.description,
-    imageUrl: state.imageUrl,
-  });
+  let guide;
+  try {
+    guide = await getStateGuideContent(stateSlug);
+  } catch {
+    notFound();
+  }
   const tours = await getToursByState(state.name);
   const showPlaces = guide.showPlacesGrid && state.cities.length > 0;
 
