@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { FALLBACK_DESTINATIONS } from "../lib/destinations-defaults";
 import { getStaticCityGuide } from "../lib/destination-guides";
+import { getStaticStateGuide } from "../lib/state-guides";
 import { cityGuideToSanityContent } from "../lib/sanity/map-city-guide";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,6 +17,8 @@ const stateLines: string[] = [];
 const cityLines: string[] = [];
 
 for (const state of FALLBACK_DESTINATIONS) {
+  const guide = getStaticStateGuide(state.slug);
+
   stateLines.push(
     JSON.stringify({
       _type: "stateGuide",
@@ -25,13 +28,21 @@ for (const state of FALLBACK_DESTINATIONS) {
       slug: state.slug,
       description: state.description,
       imageUrl: state.imageUrl,
-      metaTitle: `${state.name} | Destinations | Australia Trip Planner`,
-      metaDescription: state.description,
+      metaTitle:
+        guide?.metaTitle ??
+        `${state.name} | Destinations | Australia Trip Planner`,
+      metaDescription: guide?.metaDescription ?? state.description,
+      pageTitle: guide?.title ?? `Visit ${state.name}`,
+      heroImageUrl: guide?.heroImage.src ?? state.imageUrl,
+      heroCaption: guide?.heroImage.caption,
+      intro: guide?.intro ?? state.description,
+      showPlacesGrid: guide?.showPlacesGrid ?? true,
+      content: guide ? cityGuideToSanityContent(guide.blocks) : [],
     })
   );
 
   for (const city of state.cities) {
-    const guide = getStaticCityGuide(state.slug, city.slug);
+    const cityGuide = getStaticCityGuide(state.slug, city.slug);
 
     cityLines.push(
       JSON.stringify({
@@ -44,15 +55,15 @@ for (const state of FALLBACK_DESTINATIONS) {
         shortDescription: city.description,
         cardImageUrl: city.imageUrl,
         metaTitle:
-          guide?.metaTitle ??
+          cityGuide?.metaTitle ??
           `${city.name}, ${state.name} | Australia Trip Planner`,
-        metaDescription: guide?.metaDescription ?? city.description,
-        pageTitle: guide?.title ?? `Great things to do in ${city.name}`,
-        heroImageUrl: guide?.heroImage.src ?? city.imageUrl,
-        heroCaption: guide?.heroImage.caption,
-        intro: guide?.intro ?? city.description,
-        content: guide
-          ? cityGuideToSanityContent(guide.blocks)
+        metaDescription: cityGuide?.metaDescription ?? city.description,
+        pageTitle: cityGuide?.title ?? `Great things to do in ${city.name}`,
+        heroImageUrl: cityGuide?.heroImage.src ?? city.imageUrl,
+        heroCaption: cityGuide?.heroImage.caption,
+        intro: cityGuide?.intro ?? city.description,
+        content: cityGuide
+          ? cityGuideToSanityContent(cityGuide.blocks)
           : [
               {
                 _type: "guideParagraph",

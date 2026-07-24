@@ -4,6 +4,7 @@ import { guideImage } from "./objects/guideImage";
 import { guideList } from "./objects/guideList";
 import { guideListItem } from "./objects/guideListItem";
 import { guideParagraph } from "./objects/guideParagraph";
+import { guidePlaceTeaser } from "./objects/guidePlaceTeaser";
 import { guideTip } from "./objects/guideTip";
 import { step } from "./objects/step";
 import { cityGuide } from "./cityGuide";
@@ -21,6 +22,7 @@ export const schemaTypes = [
   guideTip,
   guideListItem,
   guideList,
+  guidePlaceTeaser,
   homepage,
   toursPage,
   tour,

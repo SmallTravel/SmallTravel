@@ -93,6 +93,54 @@ export const cityGuideQuery = groq`
       anchorId,
       caption,
       externalUrl,
+      heading,
+      body,
+      gettingThere,
+      citySlug,
+      ctaLabel,
+      image {
+        asset->{ url },
+        alt
+      },
+      items[]{
+        text,
+        subItems
+      }
+    }
+  }
+`;
+
+export const stateGuideQuery = groq`
+  *[_type == "stateGuide" && slug == $stateSlug][0]{
+    pageTitle,
+    metaTitle,
+    metaDescription,
+    intro,
+    heroCaption,
+    heroImageUrl,
+    imageUrl,
+    showPlacesGrid,
+    heroImage {
+      asset->{ url },
+      alt
+    },
+    image {
+      asset->{ url },
+      alt
+    },
+    content[]{
+      _type,
+      _key,
+      text,
+      level,
+      anchorId,
+      caption,
+      externalUrl,
+      heading,
+      body,
+      gettingThere,
+      citySlug,
+      ctaLabel,
       image {
         asset->{ url },
         alt

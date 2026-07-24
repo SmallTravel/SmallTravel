@@ -12,6 +12,11 @@ export type SanityGuideBlock = {
   externalUrl?: string;
   image?: { asset?: { url?: string }; alt?: string };
   items?: { text?: string; subItems?: string[] }[];
+  heading?: string;
+  body?: string;
+  gettingThere?: string;
+  citySlug?: string;
+  ctaLabel?: string;
 };
 
 export type SanityCityGuideDoc = {
@@ -79,6 +84,28 @@ export function mapSanityBlock(block: SanityGuideBlock): ContentBlock | null {
               : item.text!
           ),
       };
+    case "guidePlaceTeaser": {
+      if (!block.heading || !block.body) return null;
+      const { src, alt } = resolveImage(block.image, block.externalUrl);
+      const paragraphs = block.body
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+      if (!paragraphs.length) return null;
+      return {
+        type: "placeTeaser",
+        heading: block.heading,
+        paragraphs,
+        gettingThere: block.gettingThere,
+        image: {
+          src,
+          alt: alt || block.heading,
+          caption: block.caption,
+        },
+        citySlug: block.citySlug,
+        ctaLabel: block.ctaLabel || "Read More",
+      };
+    }
     default:
       return null;
   }
@@ -163,6 +190,18 @@ export function cityGuideToSanityContent(
               subItems: item.subItems,
             };
           }),
+        };
+      case "placeTeaser":
+        return {
+          _type: "guidePlaceTeaser",
+          _key: key,
+          heading: block.heading,
+          body: block.paragraphs.join("\n\n"),
+          gettingThere: block.gettingThere,
+          externalUrl: block.image.src,
+          caption: block.image.caption,
+          citySlug: block.citySlug,
+          ctaLabel: block.ctaLabel || "Read More",
         };
       default:
         return { _type: "guideParagraph", _key: key, text: "" };

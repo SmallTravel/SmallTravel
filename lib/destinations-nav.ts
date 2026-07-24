@@ -43,6 +43,33 @@ export function extractNavSections(
     }));
 }
 
+export function extractStateNavSections(
+  stateSlug: string,
+  blocks: ContentBlock[]
+): CityNavSection[] {
+  const sections: CityNavSection[] = [];
+
+  for (const block of normalizeGuideBlocks(blocks)) {
+    if (
+      block.type === "heading" &&
+      (block.level ?? 2) === 2 &&
+      block.id
+    ) {
+      sections.push({
+        label: block.text,
+        href: `/destinations/${stateSlug}#${block.id}`,
+      });
+    } else if (block.type === "placeTeaser" && block.citySlug) {
+      sections.push({
+        label: block.heading.replace(/^Visit\s+(the\s+)?/i, ""),
+        href: `/destinations/${stateSlug}/${block.citySlug}`,
+      });
+    }
+  }
+
+  return sections;
+}
+
 export type CityNavData = {
   stateSlug: string;
   citySlug: string;

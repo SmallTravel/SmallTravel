@@ -3,9 +3,11 @@ import { notFound } from "next/navigation";
 import Nav from "@/components/marketing/Nav";
 import Footer from "@/components/marketing/Footer";
 import DestinationBreadcrumbs from "@/components/destinations/DestinationBreadcrumbs";
+import DestinationGuideContent from "@/components/destinations/DestinationGuideContent";
 import CityCard from "@/components/destinations/CityCard";
 import TourCard from "@/components/tours/TourCard";
 import { getAllStates, getStateBySlug } from "@/lib/destinations";
+import { getStateGuideContent } from "@/lib/sanity/get-state-guide";
 import { getToursByState } from "@/lib/tours";
 
 type Props = { params: Promise<{ state: string }> };
@@ -20,9 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const state = await getStateBySlug(stateSlug);
   if (!state) return { title: "Destination not found" };
 
-  return {
-    title: `${state.name} | Destinations | Australia Trip Planner`,
+  const guide = await getStateGuideContent(stateSlug, {
+    name: state.name,
     description: state.description,
+    imageUrl: state.imageUrl,
+  });
+
+  return {
+    title: guide.metaTitle,
+    description: guide.metaDescription,
   };
 }
 
@@ -31,37 +39,61 @@ export default async function StateDestinationPage({ params }: Props) {
   const state = await getStateBySlug(stateSlug);
   if (!state) notFound();
 
+  const guide = await getStateGuideContent(stateSlug, {
+    name: state.name,
+    description: state.description,
+    imageUrl: state.imageUrl,
+  });
   const tours = await getToursByState(state.name);
+  const showPlaces = guide.showPlacesGrid && state.cities.length > 0;
 
   return (
     <main>
       <Nav />
-      <section className="relative bg-white border-b border-ink-100 overflow-hidden">
-        <div className="absolute inset-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={state.imageUrl}
-            alt=""
-            className="w-full h-full object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-white/80" />
-        </div>
-        <div className="container-narrow section-pad relative !pb-12">
+      <article className="bg-white">
+        <div className="container-narrow section-pad !pb-8">
           <DestinationBreadcrumbs
             crumbs={[
               { label: "Destinations", href: "/destinations" },
               { label: state.name },
             ]}
           />
-          <h1 className="mt-4 text-3xl sm:text-4xl font-semibold tracking-tight text-ink-900">
-            {state.name}
-          </h1>
-          <p className="mt-4 text-lg text-ink-600 max-w-2xl">{state.description}</p>
-        </div>
-      </section>
 
-      {state.cities.length > 0 && (
-        <section className="bg-ink-50 border-b border-ink-100">
+          <h1 className="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight text-ink-900">
+            {guide.title}
+          </h1>
+        </div>
+
+        <div className="container-narrow px-6 sm:px-10 lg:px-16 pb-12">
+          <div className="max-w-3xl">
+            <figure className="mb-8">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={guide.heroImage.src}
+                alt={guide.heroImage.alt}
+                className="w-full object-cover aspect-[16/10] bg-ink-100"
+              />
+              {guide.heroImage.caption && (
+                <figcaption className="mt-3 text-sm italic text-[#3498db]">
+                  {guide.heroImage.caption}
+                </figcaption>
+              )}
+            </figure>
+
+            {guide.intro && (
+              <p className="text-ink-700 leading-relaxed mb-6">{guide.intro}</p>
+            )}
+          </div>
+
+          <DestinationGuideContent
+            blocks={guide.blocks}
+            stateSlug={state.slug}
+          />
+        </div>
+      </article>
+
+      {showPlaces && (
+        <section className="bg-ink-50 border-t border-ink-100">
           <div className="container-narrow px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
             <h2 className="text-2xl font-semibold text-ink-900 mb-8">
               Places to visit
@@ -76,7 +108,7 @@ export default async function StateDestinationPage({ params }: Props) {
       )}
 
       {tours.length > 0 && (
-        <section className="bg-white">
+        <section className="bg-white border-t border-ink-100">
           <div className="container-narrow px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
             <h2 className="text-2xl font-semibold text-ink-900 mb-8">
               Tours in {state.name}

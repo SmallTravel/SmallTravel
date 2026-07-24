@@ -6,7 +6,18 @@ export type ContentBlock =
       items: (string | { text: string; subItems?: string[] })[];
     }
   | { type: "tip"; text: string }
-  | { type: "image"; src: string; alt: string; caption?: string };
+  | { type: "image"; src: string; alt: string; caption?: string }
+  | {
+      type: "placeTeaser";
+      heading: string;
+      /** One or more body paragraphs (v1 place cards use multiple). */
+      paragraphs: string[];
+      gettingThere?: string;
+      image: { src: string; alt: string; caption?: string };
+      citySlug?: string;
+      href?: string;
+      ctaLabel?: string;
+    };
 
 export type CityGuide = {
   title: string;
@@ -15,6 +26,16 @@ export type CityGuide = {
   heroImage: { src: string; alt: string; caption?: string };
   intro: string;
   blocks: ContentBlock[];
+};
+
+export type StateGuide = {
+  title: string;
+  metaTitle: string;
+  metaDescription: string;
+  heroImage: { src: string; alt: string; caption?: string };
+  intro: string;
+  blocks: ContentBlock[];
+  showPlacesGrid: boolean;
 };
 
 export type City = {
