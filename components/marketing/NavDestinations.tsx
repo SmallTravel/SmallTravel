@@ -20,11 +20,12 @@ export default function NavDestinations({
 }) {
   const [open, setOpen] = useState(false);
   const [activeState, setActiveState] = useState<string | null>(null);
-  const [activeCity, setActiveCity] = useState<string | null>(null);
 
-  function cityNav(stateSlug: string, citySlug: string) {
-    return destinationNav.find(
-      (item) => item.stateSlug === stateSlug && item.citySlug === citySlug
+  function cityHref(stateSlug: string, citySlug: string) {
+    return (
+      destinationNav.find(
+        (item) => item.stateSlug === stateSlug && item.citySlug === citySlug
+      )?.cityHref ?? `/destinations/${stateSlug}/${citySlug}`
     );
   }
 
@@ -52,31 +53,17 @@ export default function NavDestinations({
                   {state.name}
                 </Link>
                 {state.cities.length > 0 && (
-                  <div className="pl-3 space-y-2">
-                    {state.cities.map((city) => {
-                      const nav = cityNav(state.slug, city.slug);
-                      return (
-                        <div key={city.slug}>
-                          <Link
-                            href={nav?.cityHref ?? `/destinations/${state.slug}/${city.slug}`}
-                            onClick={onNavigate}
-                            className="block px-2 py-1 text-sm text-ink-600 hover:text-brand-700"
-                          >
-                            {city.name}
-                          </Link>
-                          {nav?.sections.map((section) => (
-                            <Link
-                              key={section.href}
-                              href={section.href}
-                              onClick={onNavigate}
-                              className="block pl-3 pr-2 py-0.5 text-xs text-ink-500 hover:text-brand-700"
-                            >
-                              {section.label}
-                            </Link>
-                          ))}
-                        </div>
-                      );
-                    })}
+                  <div className="pl-3 space-y-1">
+                    {state.cities.map((city) => (
+                      <Link
+                        key={city.slug}
+                        href={cityHref(state.slug, city.slug)}
+                        onClick={onNavigate}
+                        className="block px-2 py-1 text-sm text-ink-600 hover:text-brand-700"
+                      >
+                        {city.name}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
@@ -89,12 +76,6 @@ export default function NavDestinations({
 
   const currentState =
     states.find((s) => s.slug === activeState) ?? states[0];
-  const currentCity =
-    currentState?.cities.find((c) => c.slug === activeCity) ??
-    currentState?.cities[0];
-  const currentCityNav = currentCity
-    ? cityNav(currentState.slug, currentCity.slug)
-    : undefined;
 
   return (
     <div
@@ -103,7 +84,6 @@ export default function NavDestinations({
       onMouseLeave={() => {
         setOpen(false);
         setActiveState(null);
-        setActiveCity(null);
       }}
     >
       <button
@@ -119,19 +99,13 @@ export default function NavDestinations({
 
       {open && currentState && (
         <div className="absolute left-0 top-full pt-1 z-50">
-          <div
-            className="flex rounded-xl border border-ink-200 bg-white shadow-xl overflow-hidden max-h-[70vh]"
-            onMouseLeave={() => setActiveCity(null)}
-          >
+          <div className="flex rounded-xl border border-ink-200 bg-white shadow-xl overflow-hidden max-h-[70vh]">
             <div className="w-48 border-r border-ink-100 py-2 overflow-y-auto">
               {states.map((state) => (
                 <Link
                   key={state.slug}
                   href={getStatePath(state)}
-                  onMouseEnter={() => {
-                    setActiveState(state.slug);
-                    setActiveCity(null);
-                  }}
+                  onMouseEnter={() => setActiveState(state.slug)}
                   className={`block px-4 py-2 text-sm transition ${
                     activeState === state.slug
                       ? "bg-brand-50 text-brand-800 font-medium"
@@ -143,7 +117,7 @@ export default function NavDestinations({
               ))}
             </div>
 
-            <div className="w-44 border-r border-ink-100 py-2 overflow-y-auto">
+            <div className="w-56 py-2 overflow-y-auto">
               {currentState.cities.length === 0 ? (
                 <div className="px-4 py-3">
                   <Link
@@ -157,50 +131,14 @@ export default function NavDestinations({
                 currentState.cities.map((city) => (
                   <Link
                     key={city.slug}
-                    href={
-                      cityNav(currentState.slug, city.slug)?.cityHref ??
-                      `/destinations/${currentState.slug}/${city.slug}`
-                    }
-                    onMouseEnter={() => {
-                      setActiveState(currentState.slug);
-                      setActiveCity(city.slug);
-                    }}
-                    className={`block px-4 py-2 text-sm transition ${
-                      activeCity === city.slug
-                        ? "bg-brand-50 text-brand-800 font-medium"
-                        : "text-ink-600 hover:bg-ink-50"
-                    }`}
+                    href={cityHref(currentState.slug, city.slug)}
+                    onMouseEnter={() => setActiveState(currentState.slug)}
+                    className="block px-4 py-2 text-sm text-ink-600 hover:bg-ink-50 hover:text-brand-700"
                   >
                     {city.name}
                   </Link>
                 ))
               )}
-            </div>
-
-            <div className="w-64 py-2 overflow-y-auto">
-              {currentCityNav?.sections.length ? (
-                currentCityNav.sections.map((section) => (
-                  <Link
-                    key={section.href}
-                    href={section.href}
-                    className="block px-4 py-2 text-sm text-ink-600 hover:bg-ink-50 hover:text-brand-700 leading-snug"
-                  >
-                    {section.label}
-                  </Link>
-                ))
-              ) : currentCity ? (
-                <div className="px-4 py-3">
-                  <Link
-                    href={
-                      currentCityNav?.cityHref ??
-                      `/destinations/${currentState.slug}/${currentCity.slug}`
-                    }
-                    className="text-sm font-medium text-brand-700 hover:underline"
-                  >
-                    Explore {currentCity.name}
-                  </Link>
-                </div>
-              ) : null}
             </div>
           </div>
         </div>
